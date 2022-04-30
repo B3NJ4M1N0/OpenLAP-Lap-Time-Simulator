@@ -45,9 +45,11 @@
 import time
 import math
 import os
+import sys
 from datetime import datetime
 
 import numpy as np
+import h5py
 import pandas as pd
 
 ## Timer start
@@ -80,35 +82,39 @@ incl = 0
 ## Vehicle data pre processing
 
 #loading file
-veh = 
+# vehicleFile = 'OpenVEHICLE Vehicles/OpenVEHICLE_Formula 1_Open Wheel.mat'
+vehicleFile = '/Users/Ben/Documents/Coding/OpenLAP/OpenLAP-Lap-Time-Simulator/OpenVEHICLE Vehicles/OpenVEHICLE_Formula 1_Open Wheel.mat'
+f = h5py.File(vehicleFile,'r')
+data = f.get('data/variable1')
+veh = np.array(data) # For converting to a NumPy array
 # mass
 M = veh[M]
 # gravity constant
 g = 9.81
 #longitudinal tyre coefficients
-dmx = veh[factorGrip] * veh[sens_x]
-mux = veh[factorGrip] * veh[mu_x]
-Nx = veh[mu_x_M] * g
+dmx = veh['factorGrip'] * veh['sens_x']
+mux = veh['factorGrip'] * veh['mu_x']
+Nx = veh['mu_x_M'] * g
 # normal load on all wheels
 Wz = M*g*np.cos(np.deg2rad(bank))*np.cos(np.deg2rad(incl))
 # induced weight from banking and inclination
 Wy = M*g*np.sin(np.deg2rad(bank))
 Wx = M*g*np.sin(np.deg2rad(incl))
 # ratios
-rFinal = veh[ratioFinal]
-rGearbox = veh[ratioGearbox]
-rPrimary = veh[ratioPrimary]
+rFinal = veh['ratioFinal']
+rGearbox = veh['ratioGearbox']
+rPrimary = veh['ratioPrimary']
 # tyre radius
-Rt = veh[tyreRadius]
+Rt = veh['tyreRadius']
 # drivetrain efficiency
-nFinal = veh[nFinal]
-nGearbox = veh[nGearbox]
-nPrimary = veh[nPrimary]
+nFinal = veh['nFinal']
+nGearbox = veh['nGearbox']
+nPrimary = veh['nPrimary']
 # engine curves
-rpmCurve = np.array([0,veh[enSpeedCurve]])
-torqueCurve = veh[factorPower]*np.array([veh[enTorqueCurve][0], veh[enTorqueCurve]])
+rpmCurve = np.array([0,veh['enSpeedCurve']])
+torqueCurve = veh['factorPower']*np.array([veh['enTorqueCurve'][0], veh[enTorqueCurve]])
 # shift points
-shiftPoints = np.array(veh[shifting], veh[enSpeedCurve[-1]])
+shiftPoints = np.array(veh['shifting'], veh['enSpeedCurve'[-1]])
 
 ## Acceleration preprocessing
 
@@ -159,8 +165,33 @@ if os.path.isdir('OpenDRAGSims') == False:
 # diary
 if BUseDateTimeInName:
     now = datetime.now()
-    dateTime = now.strftime(%y_%m_%d_%H_%M_%S)
+    dateTime = now.strftime('%y_%m_%d_%H_%M_%S')
 else:
     dateTime = ''
-simName = 'OpenDRAG Sims/OpenDRAG_' + veh[name] + dateTime
-os.remove(simname + '.log')
+simName = f'OpenDRAG Sims/OpenDRAG_ {veh["name"]} _ {dateTime}'
+os.remove(simName + '.log')
+# create a python logging file
+stdout = sys.stdout
+sys.stdout = open(f'{simName} .log', 'w')
+# HUD
+print("""
+    '               _______                    ________________________________';...
+    '               __  __ \______________________  __ \__  __ \__    |_  ____/';...
+    '               _  / / /__  __ \  _ \_  __ \_  / / /_  /_/ /_  /| |  / __  ';...
+    '               / /_/ /__  /_/ /  __/  / / /  /_/ /_  _, _/_  ___ / /_/ /  ';...
+    '               \____/ _  .___/\___//_/ /_//_____/ /_/ |_| /_/  |_\____/   ';...
+    '                      /_/                                                 '...
+    """)
+print('=======================================================================================')
+print(f'Vehicle: {veh["name"]}')
+print(f'Date: {now.strftime("dd/mm/yyyy")}')
+print(f'Time: {now.strftime("HH:MM:SS")}')
+print('=======================================================================================')
+print(f'Acceleration simulation started:')
+print(f'Initial Speed: {v*3.6} km/h')
+print('|_______Comment________|_Speed_|_Accel_|_EnRPM_|_Gear__|_Tabs__|_Xabs__|_Trel__|_Xrel_|')
+print('|______________________|[km/h]_|__[G]__|_[rpm]_|__[#]__|__[s]__|__[m]__|__[s]__|_[m]__|')
+
+## Acceleration
+
+# acceleration timer startsys.stdout.close()
