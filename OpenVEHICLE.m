@@ -38,14 +38,14 @@ classdef OpenVEHICLE < handle
     
     methods
         
-        function [data] = read_torque_curve(workbookFile,sheetName,startRow,endRow)
+        function [data] = read_torque_curve(app,sheetName,startRow,endRow)
             % Input handling
             % If no sheet is specified, read first sheet
             if nargin == 1 || isempty(sheetName)
                 sheetName = 1;
             end
             % If row start and end points are not specified, define defaults
-            if nargin <= 3
+            if nargin <= 2
                 startRow = 2;
                 endRow = 10000;
             end
@@ -61,15 +61,15 @@ classdef OpenVEHICLE < handle
             opts.MissingRule = "omitrow";
             opts = setvaropts(opts, [1, 2], "TreatAsMissing", '');
             % Import the data
-            data = readtable(workbookFile, opts, "UseExcel", false);
+            data = readtable(fullfile('Vehicles', app.filename), opts, "UseExcel", false);
             for idx = 2:length(startRow)
                 opts.DataRange = "A" + startRow(idx) + ":B" + endRow(idx);
-                tb = readtable(workbookFile, opts, "UseExcel", false);
+                tb = readtable(fullfile('Vehicles',app.filename), opts, "UseExcel", false);
                 data = [data; tb]; %#ok<AGROW>
             end
         end
         
-        function [data] = read_info(workbookFile,sheetName,startRow,endRow)
+        function [data] = read_info(~, workbookFile,sheetName,startRow,endRow)
             % Input handling
             % If no sheet is specified, read first sheet
             if nargin == 1 || isempty(sheetName)
@@ -112,8 +112,8 @@ classdef OpenVEHICLE < handle
                                     
             % Reading vehicle file
             
-            info = read_info(app.filename,'Info') ;
-            data = read_torque_curve(app.filename,'Torque Curve') ;
+            info = app.read_info(fullfile('Vehicles',app.filename),'Info') ;
+            data = app.read_torque_curve('Torque Curve') ;
             
             % Getting variables
             
@@ -187,7 +187,7 @@ classdef OpenVEHICLE < handle
                 '       /_/                                                                          '...
                 ]) ;
             disp('====================================================================================')
-            disp(filename)
+            disp(app.filename)
             disp('File read successfully')
             disp('====================================================================================')
             disp("Name: "+name)
@@ -485,6 +485,7 @@ classdef OpenVEHICLE < handle
 
         function OpenVEHICLE = OpenVEHICLE()
             % Initialises the OpenVEHICLE object
+            OpenVEHICLE.runSimulation();
         end
 
     end
