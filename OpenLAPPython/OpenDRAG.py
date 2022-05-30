@@ -47,10 +47,14 @@ import math
 import os
 import sys
 from datetime import datetime
+from turtle import end_fill
 
 import numpy as np
 import h5py
 import pandas as pd
+
+def hud(v, a, rpm, gear, t, x, tStart, xStart):
+    return f'{v*3.6}, {a/9.81}, {round(rpm)}, {gear}, {t}, {x}, {t-tStart}, {x-xStart}'
 
 ## Timer start
 
@@ -151,11 +155,11 @@ tps = 0
 # initial bps
 bps = 0
 # initial trap number
-trapNumber = 1
+trapNumber = 0
 # speed trap checking condition
 BCheckSpeedTraps = True
 # iteration number
-i = 1
+i = 0
 
 ## HUD display
 
@@ -195,3 +199,96 @@ print('|______________________|[km/h]_|__[G]__|_[rpm]_|__[#]__|__[s]__|__[m]__|_
 ## Acceleration
 
 # acceleration timer startsys.stdout.close()
+while True:
+    # saving values
+    MODE[i] = 1
+    T[i] = t
+    X[i] = x
+    V[i] = v
+    A[i] = a
+    RPM[i] = rpm
+    TPS[i] = tps
+    BPS[i] = 0
+    GEAR[i] = gear
+
+    # checking if rpm limiter is on or if out of memory
+    if v >= veh['vMax']:
+        # HUD
+        print(f'Engine speed limited')
+        hud(v, a, rpm, gear, t, x, tStart, xStart)
+        break
+    elif i==N:
+        print(f'Did not reach maximum speed at time {t}s')
+    # check if drag limited
+    if tps == 1 & ax + axDrag <= axSens:
+        # HUD
+        print('Drag Limited')
+        hud(v, a, rpm, gear, t, x, tStart, xStart)
+        break
+    # checking speed trap
+    if BCheckSpeedTraps:
+        # checking if current speed is above trap speed
+        if v >= speedTrap(trapNumber):
+            print(f'Speed Trap #{trapNumber}, {round(speedTrap(trapNumber) * 3.6)}, km/h')
+            hud(v, a, rpm, gear, t, x, tStart, xStart)
+            # next speed trap
+            trapNumber += 1
+            # checking if speed traps are completed
+            if trapNumber > len(speedTrap):
+                BCheckSpeedTraps = False
+    # aero forces
+    aeroDf = 1/2 * veh['rho'] * veh['factorCl'] * veh['Cl'] * veh['A'] * v^2
+    aeroDr = 1/2 * veh['rho'] * veh['factorCd'] * veh['Cd'] * veh['A'] * v^2
+    # rolling resistance
+    rollDr = veh['Cr'] * (-aeroDf + Wz)
+    # normal load on driven wheels
+    Wd = (veh['factorDrive'] * Wz + (-veh['factorAero'] * aeroDf))/veh['drivenWheels']
+    # drag acceleration
+    axDrag = (aeroDr + rollDr + Wx)/M
+    # rpm calculation
+    if gear == 0: # shifting gears
+        rpm = rf*rg[gearPrev - 1] * rp * v/Rt * 60 / 2 / np.pi()
+        rpmShift = shiftPoints[gearPrev - 1]
+    else: # gear change finished
+        rpm = rf * rg[gear - 1] * rp * v/Rt * 60 / 2 / np.pi()
+        rpmShift = shiftPoints[gear - 1]
+    # checking for gearshifts
+    if rpm >= rpmShift & ~BShifting: # need to change gears
+        if gear == veh['nog']: # maximum gear number
+            # HUD
+            print('Engine speed limited')
+            hud(v, a, rpm, gear, t, x, tStart, xStart)
+            break
+        else: # higher gear available
+            # shifting condition
+            BShifting = True
+            # shift initialisation time
+            tShift = t
+            # zeroing engine acceleration
+            ax = 0
+            # saving previous gear
+            gearPrev = gear
+            # setting gear to neutral for duration of gearshift
+            gear = 0
+    elif BShifting: # currently shifting gears
+        # zeroing engine acceleration
+        ax = 0
+        # checking if gearshift duration has passed
+        if t-tShift > veh['shiftTime']:
+            # HUD
+            print(f'Shifting to gear {gearPrev + 1}')
+            hud(v, a, rpm, gearPrev + 1, t, x, tStart, xStart)
+            # shifting condition
+            BShifting = False
+            # next gear
+            gear = gearPrev + 1
+    else: # no gearshift
+        # max long acc available from tyres
+        ax_tyre_max_acc = 1/M*(mux + dmx * (Nx - Wd)) * Wd * veh['drivenWheels']
+        # getting power limit from engine
+        engineTorque = np.interp1(rpmCurve, torqueCurve, rpm)
+        wheelTorque = engineTorque * rf * rg[gear - 1]
+        axPowerLimit = 1/M * wheelTorque / Rt
+        # final long acc
+        ax = min(axPowerLimit, axTyreMaxAcc)
+    # tps
