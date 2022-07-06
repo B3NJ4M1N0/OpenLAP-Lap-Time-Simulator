@@ -1,4 +1,4 @@
-classdef OpenGUI
+classdef OpenGUI < handle
     %OPENGUI Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -22,15 +22,15 @@ classdef OpenGUI
             % Set up the title text
             app.GUI.title = uicontrol('parent',app.GUI.window,'Style','text');
             app.GUI.title.String = 'OpenGUI';
-            app.GUI.title.FontSize = 35;
+            app.GUI.title.FontSize = 20;
             app.GUI.title.Units = 'normalized';
-            app.GUI.title.Position = [0.05 0.8 0.4 0.1];
+            app.GUI.title.Position = [0.025 0.85 0.1 0.1];
 
             % Set up the user inputs
             app.GUI.simulationList = uicontrol('parent',app.GUI.window,'Style','listbox');
             app.GUI.simulationList.String = {'OpenVEHICLE','OpenTrack','OpenDRAG','OpenLap'};
             app.GUI.simulationList.Units = 'normalized';
-            app.GUI.simulationList.Position = [0.05 0.05 0.4 0.7];
+            app.GUI.simulationList.Position = [0.025 0.7 0.1 0.15];
             app.GUI.simulationList.Callback = @app.simulationListChanged;
 
             % Create a 'run' button
@@ -57,7 +57,7 @@ classdef OpenGUI
             % First reset the right hand side of the GUI
             app.GUI.simulationPanel = uipanel('parent', app.GUI.window);
             app.GUI.simulationPanel.Units = 'normalized';
-            app.GUI.simulationPanel.Position = [0.55 0.25 0.4 0.7];
+             app.GUI.simulationPanel.Position = [0.55 0.25 0.4 0.7];
             app.GUI.simulationPanel.Title = 'Simulation Setup';
 
             listIndex = app.GUI.simulationList.Value;
