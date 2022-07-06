@@ -116,7 +116,7 @@ nGearbox = veh['nGearbox']
 nPrimary = veh['nPrimary']
 # engine curves
 rpmCurve = np.array([0,veh['enSpeedCurve']])
-torqueCurve = veh['factorPower']*np.array([veh['enTorqueCurve'][0], veh[enTorqueCurve]])
+torqueCurve = veh['factorPower']*np.array([veh['enTorqueCurve'][0], veh['enTorqueCurve']])
 # shift points
 shiftPoints = np.array(veh['shifting'], veh['enSpeedCurve'[-1]])
 
@@ -284,7 +284,7 @@ while True:
             gear = gearPrev + 1
     else: # no gearshift
         # max long acc available from tyres
-        ax_tyre_max_acc = 1/M*(mux + dmx * (Nx - Wd)) * Wd * veh['drivenWheels']
+        axTyreMaxAcc = 1/M*(mux + dmx * (Nx - Wd)) * Wd * veh['drivenWheels']
         # getting power limit from engine
         engineTorque = np.interp1(rpmCurve, torqueCurve, rpm)
         wheelTorque = engineTorque * rf * rg[gear - 1]

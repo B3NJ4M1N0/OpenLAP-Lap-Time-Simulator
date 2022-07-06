@@ -1,4 +1,4 @@
-classdef OpenGUI
+classdef OpenGUI < handle
     %OPENGUI Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -43,7 +43,6 @@ classdef OpenGUI
             % First reset the right hand side of the GUI
             app.GUI.simulationPanel = uipanel('parent', app.GUI.window);
             app.GUI.simulationPanel.Units = 'normalized';
-%             app.GUI.simulationPanel.Position = [0.025 0.1 0.2 0.45];
             app.GUI.simulationPanel.Position = [0.55 0.25 0.4 0.7];
             app.GUI.simulationPanel.Title = 'Simulation Setup';
 
@@ -58,10 +57,7 @@ classdef OpenGUI
             % First reset the right hand side of the GUI
             app.GUI.simulationPanel = uipanel('parent', app.GUI.window);
             app.GUI.simulationPanel.Units = 'normalized';
-%             app.GUI.simulationList.Position = [0.025 0.7 0.1 0.15];
              app.GUI.simulationPanel.Position = [0.55 0.25 0.4 0.7];
-%             app.GUI.simulationList.Position = [0.55 0.25 0.4 0.7];
-            app.GUI.simulationList.Position = [0.55 0.55 0.1 0.15];
             app.GUI.simulationPanel.Title = 'Simulation Setup';
 
             listIndex = app.GUI.simulationList.Value;
@@ -71,14 +67,19 @@ classdef OpenGUI
             % Car file selection for OpenVEHICLE
                 app.GUI.vehicleSelectionBox = uicontrol('parent', app.GUI.simulationPanel, 'Style','popupmenu');
                 app.GUI.vehicleSelectionBox.Units = 'normalized';
-%                 app.GUI.vehicleSelectionBox.Position = [0.1 0.8 0.3 0.1];
-                app.GUI.vehicleSelectionBox.Position = [0.55 0.25 0.3 0.1];
+                app.GUI.vehicleSelectionBox.Position = [0.1 0.8 0.3 0.1];
                 vehicleFiles = dir('Vehicles');
                 vehicleFiles = vehicleFiles(~(strcmp({vehicleFiles.name}, '.') | strcmp({vehicleFiles.name}, '..')), :);
                 app.GUI.vehicleSelectionBox.String = {vehicleFiles.name};
 
             elseif strcmp(simulationName,'OpenTRACK')
             % Track file selection for OpenTRACK
+                app.GUI.trackSelectionBox = uicontrol('parent', app.GUI.simulationPanel, 'Style','popupmenu');
+                app.GUI.trackSelectionBox.Units = 'normalized';
+                app.GUI.trackSelectionBox.Position = [0.1 0.8 0.3 0.1];
+                trackFiles = dir('Tracks');
+                trackFiles = trackFiles(~(strcmp({trackFiles.name}, '.') | strcmp({trackFiles.name}, '..')), :);
+                app.GUI.trackSelectionBox.String = {trackFiles.name};
             elseif strcmp(simulationName,'OpenLAP')
             % Lap file selection for OpenLAP
             elseif strcmp(simulationName,'OpenDRAG')

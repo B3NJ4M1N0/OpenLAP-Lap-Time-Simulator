@@ -28,7 +28,7 @@ classdef OpenGUI < handle
 
             % Set up the user inputs
             app.GUI.simulationList = uicontrol('parent',app.GUI.window,'Style','listbox');
-            app.GUI.simulationList.String = {'OpenVEHICLE','OpenTrack','OpenDRAG','OpenLap'};
+            app.GUI.simulationList.String = {'OpenVEHICLE','OpenTRACK','OpenDRAG','OpenLap'};
             app.GUI.simulationList.Units = 'normalized';
             app.GUI.simulationList.Position = [0.025 0.7 0.1 0.15];
             app.GUI.simulationList.Callback = @app.simulationListChanged;
@@ -74,6 +74,12 @@ classdef OpenGUI < handle
 
             elseif strcmp(simulationName,'OpenTRACK')
             % Track file selection for OpenTRACK
+                app.GUI.trackSelectionBox = uicontrol('parent', app.GUI.simulationPanel, 'Style','popupmenu');
+                app.GUI.trackSelectionBox.Units = 'normalized';
+                app.GUI.trackSelectionBox.Position = [0.1 0.8 0.3 0.1];
+                trackFiles = dir('Tracks');
+                trackFiles = trackFiles(~(strcmp({trackFiles.name}, '.') | strcmp({trackFiles.name}, '..')), :);
+                app.GUI.trackSelectionBox.String = {trackFiles.name};
             elseif strcmp(simulationName,'OpenLAP')
             % Lap file selection for OpenLAP
             elseif strcmp(simulationName,'OpenDRAG')
