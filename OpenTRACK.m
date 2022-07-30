@@ -68,23 +68,14 @@ classdef OpenTRACK < handle
             
             %% Track file selection
             
-            % filename = 'Paul Ricard data.csv' ;
-            % filename = 'Spa-Francorchamps.xlsx' ;
-            % filename = 'Monza Data.csv' ;
-            % filename = 'OpenTRACK Laguna Seca Data.csv' ;
-            % filename = 'OpenTRACK Paul Ricard Data.csv' ;
-%             app.filename = fullfile('Tracks', 'OpenTRACK_FSAE_UK_Endurance_2015.xlsx') ;
-%             app.filename = fullfile('Tracks', 'FSAE Skidpad.xlsx') ;
-            app.filename = fullfile('Tracks', 'Autodromo Nazionale Monza.xlsx') ;
-            % filename = 'OpenTRACK KZ2 Kart Data - Rhodes.csv' ;
-            % filename = 'OpenTRACK KZ2 Kart Data - Athens.csv' ;
+%             app.filename = fullfile('Tracks', 'Autodromo Nazionale Monza.xlsx');
             
             %% Mode selection
             
             % mode = 'logged data' ;
-            app.mode = 'shape data' ;
+%             app.mode = 'shape data' ;
             % log_mode = 'speed & yaw' ;
-            app.log_mode = 'speed & latacc' ;
+%             app.log_mode = 'speed & latacc' ;
             
             %% Settings
             

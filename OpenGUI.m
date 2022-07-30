@@ -17,7 +17,7 @@ classdef OpenGUI < handle
             % Initialise the app and create the GUI
             app.GUI.window = figure;
             app.GUI.window.Units = 'normalized';
-            app.GUI.window.Position = [0.1 0.1 0.4 0.4];
+            app.GUI.window.Position = [0.1 0.1 0.8 0.8];
 
             % Set up the title text
             app.GUI.title = uicontrol('parent',app.GUI.window,'Style','text');
@@ -67,7 +67,7 @@ classdef OpenGUI < handle
             % Car file selection for OpenVEHICLE
                 app.GUI.vehicleSelectionBox = uicontrol('parent', app.GUI.simulationPanel, 'Style','popupmenu');
                 app.GUI.vehicleSelectionBox.Units = 'normalized';
-                app.GUI.vehicleSelectionBox.Position = [0.1 0.8 0.3 0.1];
+                app.GUI.vehicleSelectionBox.Position = [0.1 0.8 0.7 0.1];
                 vehicleFiles = dir('Vehicles');
                 vehicleFiles = vehicleFiles(~(strcmp({vehicleFiles.name}, '.') | strcmp({vehicleFiles.name}, '..')), :);
                 app.GUI.vehicleSelectionBox.String = {vehicleFiles.name};
@@ -76,7 +76,7 @@ classdef OpenGUI < handle
             % Track file selection for OpenTRACK
                 app.GUI.trackSelectionBox = uicontrol('parent', app.GUI.simulationPanel, 'Style','popupmenu');
                 app.GUI.trackSelectionBox.Units = 'normalized';
-                app.GUI.trackSelectionBox.Position = [0.1 0.8 0.3 0.1];
+                app.GUI.trackSelectionBox.Position = [0.1 0.8 0.7 0.1];
                 trackFiles = dir('Tracks');
                 trackFiles = trackFiles(~(strcmp({trackFiles.name}, '.') | strcmp({trackFiles.name}, '..')), :);
                 app.GUI.trackSelectionBox.String = {trackFiles.name};
@@ -115,6 +115,10 @@ classdef OpenGUI < handle
 
         function app = runOpenTRACK(app, ~, ~)
             % Runs the OpenTRACK function with the given GUI inputs
+            app.TRACK = OpenTRACK;
+            app.TRACK.filename = fullfile( 'Tracks', app.GUI.trackSelectionBox.String{app.GUI.trackSelectionBox.Value} );
+            app.TRACK.mode = 'shape data';
+            app.TRACK.log_mode = 'speed & latacc';
         end
 
         function app = runOpenVEHICLE(app, ~, ~)

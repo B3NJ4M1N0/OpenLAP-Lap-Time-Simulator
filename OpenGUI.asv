@@ -28,7 +28,7 @@ classdef OpenGUI < handle
 
             % Set up the user inputs
             app.GUI.simulationList = uicontrol('parent',app.GUI.window,'Style','listbox');
-            app.GUI.simulationList.String = {'OpenVEHICLE','OpenTrack','OpenDRAG','OpenLap'};
+            app.GUI.simulationList.String = {'OpenVEHICLE','OpenTRACK','OpenDRAG','OpenLap'};
             app.GUI.simulationList.Units = 'normalized';
             app.GUI.simulationList.Position = [0.025 0.7 0.1 0.15];
             app.GUI.simulationList.Callback = @app.simulationListChanged;
@@ -115,6 +115,10 @@ classdef OpenGUI < handle
 
         function app = runOpenTRACK(app, ~, ~)
             % Runs the OpenTRACK function with the given GUI inputs
+            app.TRACK = OpenTRACK;
+            app.TRACK.filename = fullfile( 'Tracks', app.GUI.trackSelectionBox.String{app.GUI.trackSelectionBox.Value});
+            app.TRACK.mode = 'shape data';
+            app.TRACK.log_mode = 
         end
 
         function app = runOpenVEHICLE(app, ~, ~)
