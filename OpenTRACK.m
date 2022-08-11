@@ -54,12 +54,14 @@ classdef OpenTRACK < handle
         filename
         mode
         log_mode
+        fig
+        plotPane
     end
     
     methods
         %% Clearing memory
         
-        function runSimulation(app)    
+        function f = runSimulation(app)    
 %             clear
 %             clc
 %             close all force
@@ -545,7 +547,11 @@ classdef OpenTRACK < handle
             W = 900 ;
             Xpos = floor((SS(3)-W)/2) ;
             Ypos = floor((SS(4)-H)/2) ;
-            f = figure('Name',app.filename,'Position',[Xpos,Ypos,W,H]) ;
+            app.fig = figure('Name',app.filename,'Position',[Xpos,Ypos,W,H], 'Visible', 'off') ;
+            % Make a pane in the figure so that you can transfer the results to the GUI.
+            figurePane = uipanel(app.fig);
+            figurePane.Units = 'normalized';
+            figurePane.Position = [0 0 1 1];
             figtitle = ["OpenTRACK","Track Name: "+info.name,"Configuration: "+info.config,"Mirror: "+info.mirror,"Date & Time: "+datestr(now,'yyyy/mm/dd')+" "+datestr(now,'HH:MM:SS')] ;
             figtitle = strrep(figtitle,"_"," ") ;
             sgtitle(figtitle)
@@ -555,7 +561,7 @@ classdef OpenTRACK < handle
             cols = 2 ;
             
             % 3d map
-            subplot(rows,cols,[1,3,5,7,9])
+            subplot(rows,cols,[1,3,5,7,9], 'Parent', figurePane)
             title('3D Map')
             hold on
             grid on
@@ -567,7 +573,7 @@ classdef OpenTRACK < handle
             plot3(arrow_x,arrow_y,arrow_z,'k','LineWidth',2)
             
             % curvature
-            subplot(rows,cols,2)
+            subplot(rows,cols,2, 'Parent', figurePane)
             title('Curvature')
             hold on
             grid on
@@ -579,7 +585,7 @@ classdef OpenTRACK < handle
             legend({'curvature','apex'})
             
             % elevation
-            subplot(rows,cols,4)
+            subplot(rows,cols,4, 'Parent', figurePane)
             title('Elevation')
             hold on
             grid on
@@ -589,7 +595,7 @@ classdef OpenTRACK < handle
             xlim([x(1),x(end)])
             
             % inclination
-            subplot(rows,cols,6)
+            subplot(rows,cols,6, 'Parent', figurePane)
             title('Inclination')
             hold on
             grid on
@@ -599,7 +605,7 @@ classdef OpenTRACK < handle
             xlim([x(1),x(end)])
             
             % banking
-            subplot(rows,cols,8)
+            subplot(rows,cols,8, 'Parent', figurePane)
             title('Banking')
             hold on
             grid on
@@ -609,7 +615,7 @@ classdef OpenTRACK < handle
             xlim([x(1),x(end)])
             
             % grip factors
-            subplot(rows,cols,10)
+            subplot(rows,cols,10, 'Parent', figurePane)
             title('Grip Factor')
             hold on
             grid on
@@ -619,7 +625,9 @@ classdef OpenTRACK < handle
             xlim([x(1),x(end)])
             
             % saving plot
-            savefig(f,trackname+".fig")
+            savefig(app.fig,trackname+".fig")
+            % Set class plot property
+            app.plotPane = figurePane;
             % HUD
             disp('Plots created and saved.')
             
@@ -823,9 +831,11 @@ classdef OpenTRACK < handle
             fclose(fileID);
         end
 
-        function OpenTRACK = OpenTRACK()
+        function OpenTRACK = OpenTRACK(filename)
             % Initialises the OpenVEHICLE object
+            OpenTRACK.filename = filename;
             OpenTRACK.runSimulation();
+%             close(OpenTRACK.fig);
         end
 
     end

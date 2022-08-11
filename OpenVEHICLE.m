@@ -32,7 +32,8 @@ classdef OpenVEHICLE < handle
     % April 2020.
 
    properties
-        filename = 'Formula 1.xlsx';
+%         filename = 'Formula 1.xlsx';
+        filename
         GUI
    end
     
@@ -483,8 +484,9 @@ classdef OpenVEHICLE < handle
             diary('off') ;
         end
 
-        function OpenVEHICLE = OpenVEHICLE()
+        function OpenVEHICLE = OpenVEHICLE(filename)
             % Initialises the OpenVEHICLE object
+            OpenVEHICLE.filename = filename;
             OpenVEHICLE.runSimulation();
         end
 

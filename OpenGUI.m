@@ -33,18 +33,26 @@ classdef OpenGUI < handle
             app.GUI.simulationList.Position = [0.025 0.7 0.1 0.15];
             app.GUI.simulationList.Callback = @app.simulationListChanged;
 
+            % First reset the simulation panel
+            % TODO: There is no garbage collection on this, turn into function app.resetSimPanel().
+            % TODO: This panel should just be a list that updates with everything in it.
+            app.GUI.simulationPanel = uipanel('parent', app.GUI.window);
+            app.GUI.simulationPanel.Units = 'normalized';
+            app.GUI.simulationPanel.Position = [0.025 0.05 0.2 0.5];
+            app.GUI.simulationPanel.Title = 'Simulation Setup';
+
+            % TODO: add in a results pane on the right that will hold the plots.
+            app.GUI.resultsPane = uipanel('parent', app.GUI.window);
+            app.GUI.resultsPane.Units = 'normalized';
+            app.GUI.resultsPane.Position = [0.3 0.1 0.6 0.8];
+            app.GUI.resultsPane.Title = 'Results';
+
             % Create a 'run' button
             app.GUI.runButton = uicontrol('parent',app.GUI.window,'Style','pushbutton');
             app.GUI.runButton.String = 'Run Simulation';
             app.GUI.runButton.Units = 'normalized';
             app.GUI.runButton.Position = [0.85 0.1 0.1 0.1];
             app.GUI.runButton.Callback = @app.runButtonPressed;
-
-            % First reset the right hand side of the GUI
-            app.GUI.simulationPanel = uipanel('parent', app.GUI.window);
-            app.GUI.simulationPanel.Units = 'normalized';
-            app.GUI.simulationPanel.Position = [0.55 0.25 0.4 0.7];
-            app.GUI.simulationPanel.Title = 'Simulation Setup';
 
         end
 
@@ -54,10 +62,10 @@ classdef OpenGUI < handle
 
             % Sets up the available buttons for each simulation type
 
-            % First reset the right hand side of the GUI
+            % First reset the simulation panel
             app.GUI.simulationPanel = uipanel('parent', app.GUI.window);
             app.GUI.simulationPanel.Units = 'normalized';
-             app.GUI.simulationPanel.Position = [0.55 0.25 0.4 0.7];
+            app.GUI.simulationPanel.Position = [0.025 0.05 0.2 0.5];
             app.GUI.simulationPanel.Title = 'Simulation Setup';
 
             listIndex = app.GUI.simulationList.Value;
@@ -95,9 +103,10 @@ classdef OpenGUI < handle
 
             % Runs the functions based on the user inputs
             if strcmp(simulationName,'OpenVEHICLE')
-                app.runOpenVEHICLE;
+                resultsPlot = app.runOpenVEHICLE;
+                % Update the app.GUI.resultsPanel here with 'resultsPlot'.
             elseif strcmp(simulationName,'OpenTRACK')
-                app.runOpenTRACK;
+                resultsPlot = app.runOpenTRACK;
             elseif strcmp(simulationName,'OpenLAP')
                 app.runOpenLAP;
             elseif strcmp(simulationName,'OpenDRAG')
@@ -115,16 +124,21 @@ classdef OpenGUI < handle
 
         function app = runOpenTRACK(app, ~, ~)
             % Runs the OpenTRACK function with the given GUI inputs
-            app.TRACK = OpenTRACK;
-            app.TRACK.filename = fullfile( 'Tracks', app.GUI.trackSelectionBox.String{app.GUI.trackSelectionBox.Value} );
+            filename = fullfile( 'Tracks', app.GUI.trackSelectionBox.String{app.GUI.trackSelectionBox.Value} );
+            app.TRACK = OpenTRACK(filename);
             app.TRACK.mode = 'shape data';
             app.TRACK.log_mode = 'speed & latacc';
+            % Get the plot object from OpenTRACK and assign it to the results panel.
+            trackPlot = app.TRACK.plotPane; % this doesn't exist yet
+            trackPlot.Parent = app.GUI.resultsPane;
+            % Attempt some garbage collection
+            close(app.TRACK.fig);
         end
 
         function app = runOpenVEHICLE(app, ~, ~)
             % Runs the OpenVEHICLE function with the given GUI inputs
-            app.VEHICLE = OpenVEHICLE;
-            app.VEHICLE.filename = app.GUI.vehicleSelectionBox.String{app.GUI.vehicleSelectionBox.Value};
+            filename = app.GUI.vehicleSelectionBox.String{app.GUI.vehicleSelectionBox.Value};
+            app.VEHICLE = OpenVEHICLE(filename);
 
         end
 
