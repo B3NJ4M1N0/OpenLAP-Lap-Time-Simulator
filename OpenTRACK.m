@@ -61,7 +61,7 @@ classdef OpenTRACK < handle
     methods
         %% Clearing memory
         
-        function f = runSimulation(app)    
+        function runSimulation(app)    
 %             clear
 %             clc
 %             close all force
@@ -638,36 +638,36 @@ classdef OpenTRACK < handle
             % HUD
             disp('Track generated successfully.')
             
-            %% ASCII map
-            
-            charh = 15 ; % font height [pixels]
-            charw = 8 ; % font width [pixels]
-            linew = 66 ; % log file character width
-            mapw = max(X)-min(X) ; % map width
-            YY = round(Y/(charh/charw)/mapw*linew) ; % scales y values
-            XX = round(X/mapw*linew) ; % scales x values
-            YY = -YY-min(-YY) ; % flipping y and shifting to positive space
-            XX = XX-min(XX) ; % shifting x to positive space
-            p = unique([XX,YY],'rows') ; % getting unique points
-            XX = p(:,1)+1 ; % saving x
-            YY = p(:,2)+1 ; % saving y
-            maph = max(YY) ; % getting new map height [lines]
-            mapw = max(XX) ; % getting new map width [columns]
-            map = char(maph,mapw) ; % character map preallocation
-            % looping through characters
-            for i=1:maph
-                for j=1:mapw
-                    check = [XX,YY]==[j,i] ; % checking if pixel is on
-                    check = check(:,1).*check(:,2) ; % combining truth table
-                    if max(check)
-                        map(i,j) = 'o' ; % pixel is on
-                    else
-                        map(i,j) = ' ' ; % pixel is off
-                    end
-                end
-            end
-            disp('Map:')
-            disp(map)
+%             %% ASCII map
+%             
+%             charh = 15 ; % font height [pixels]
+%             charw = 8 ; % font width [pixels]
+%             linew = 66 ; % log file character width
+%             mapw = max(X)-min(X) ; % map width
+%             YY = round(Y/(charh/charw)/mapw*linew) ; % scales y values
+%             XX = round(X/mapw*linew) ; % scales x values
+%             YY = -YY-min(-YY) ; % flipping y and shifting to positive space
+%             XX = XX-min(XX) ; % shifting x to positive space
+%             p = unique([XX,YY],'rows') ; % getting unique points
+%             XX = p(:,1)+1 ; % saving x
+%             YY = p(:,2)+1 ; % saving y
+%             maph = max(YY) ; % getting new map height [lines]
+%             mapw = max(XX) ; % getting new map width [columns]
+%             map = char(maph,mapw) ; % character map preallocation
+%             % looping through characters
+%             for i=1:maph
+%                 for j=1:mapw
+%                     check = [XX,YY]==[j,i] ; % checking if pixel is on
+%                     check = check(:,1).*check(:,2) ; % combining truth table
+%                     if max(check)
+%                         map(i,j) = 'o' ; % pixel is on
+%                     else
+%                         map(i,j) = ' ' ; % pixel is off
+%                     end
+%                 end
+%             end
+%             disp('Map:')
+%             disp(map)
             
             % diary
             diary('off') ;
@@ -831,10 +831,10 @@ classdef OpenTRACK < handle
             fclose(fileID);
         end
 
-        function OpenTRACK = OpenTRACK(filename)
+        function OpenTRACK = OpenTRACK
             % Initialises the OpenVEHICLE object
-            OpenTRACK.filename = filename;
-            OpenTRACK.runSimulation();
+%             OpenTRACK.filename = filename;
+%             OpenTRACK.runSimulation();
 %             close(OpenTRACK.fig);
         end
 

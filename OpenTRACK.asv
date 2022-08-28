@@ -547,7 +547,7 @@ classdef OpenTRACK < handle
             W = 900 ;
             Xpos = floor((SS(3)-W)/2) ;
             Ypos = floor((SS(4)-H)/2) ;
-            app.fig = figure('Name',app.filename,'Position',[Xpos,Ypos,W,H], 'Visible', 'on') ;
+            app.fig = figure('Name',app.filename,'Position',[Xpos,Ypos,W,H], 'Visible', 'off') ;
             % Make a pane in the figure so that you can transfer the results to the GUI.
             figurePane = uipanel(app.fig);
             figurePane.Units = 'normalized';
@@ -625,7 +625,7 @@ classdef OpenTRACK < handle
             xlim([x(1),x(end)])
             
             % saving plot
-            savefig(f,trackname+".fig")
+            savefig(app.fig,trackname+".fig")
             % Set class plot property
             app.plotPane = figurePane;
             % HUD
@@ -831,11 +831,11 @@ classdef OpenTRACK < handle
             fclose(fileID);
         end
 
-        function OpenTRACK = OpenTRACK(filename)
+        function OpenTRACK = OpenTRACK
             % Initialises the OpenVEHICLE object
-            OpenTRACK.filename = filename;
-            OpenTRACK.runSimulation();
-            OpenTRACK.
+%             OpenTRACK.filename = filename;
+%             OpenTRACK.runSimulation();
+%             close(OpenTRACK.fig);
         end
 
     end

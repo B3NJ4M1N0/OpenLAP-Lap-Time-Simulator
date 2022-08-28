@@ -35,6 +35,8 @@ classdef OpenVEHICLE < handle
 %         filename = 'Formula 1.xlsx';
         filename
         GUI
+        fig
+        plotPane
    end
     
     methods
@@ -401,7 +403,11 @@ classdef OpenVEHICLE < handle
             W = 900 ;
             Xpos = floor((SS(3)-W)/2) ;
             Ypos = floor((SS(4)-H)/2) ;
-            f = figure('Name','Vehicle Model','Position',[Xpos,Ypos,W,H]) ;
+            app.fig = figure('Name','Vehicle Model','Position',[Xpos,Ypos,W,H], 'Visible', 'off') ;
+            % Make a pane in the figure so that you can transfer the results to the GUI.
+            figurePane = uipanel(app.fig);
+            figurePane.Units = 'normalized';
+            figurePane.Position = [0 0 1 1];
             sgtitle(name)
             
             % rows and columns
@@ -409,7 +415,7 @@ classdef OpenVEHICLE < handle
             cols = 2 ;
             
             % engine curves
-            subplot(rows,cols,1)
+            subplot(rows,cols,1, 'Parent', figurePane)
             hold on
             title('Engine Curve')
             xlabel('Engine Speed [rpm]')
@@ -423,7 +429,7 @@ classdef OpenVEHICLE < handle
             ylabel('Engine Power [Hp]')
             
             % gearing
-            subplot(rows,cols,3)
+            subplot(rows,cols,3, 'Parent', figurePane)
             hold on
             title('Gearing')
             xlabel('Speed [m/s]')
@@ -438,7 +444,7 @@ classdef OpenVEHICLE < handle
             ylim([gear(1)-1,gear(end)+1])
             
             % traction model
-            subplot(rows,cols,[5,7])
+            subplot(rows,cols,[5,7], 'Parent', figurePane)
             hold on
             title('Traction Model')
             plot(vehicle_speed,factor_power*fx_engine,'k','LineWidth',4)
@@ -456,7 +462,7 @@ classdef OpenVEHICLE < handle
             legend({'Engine tractive force','Final tractive force','Aero drag','Rolling resistance','Max tyre tractive force','Engine tractive force per gear'},'Location','southoutside')
             
             % ggv map
-            subplot(rows,cols,[2,4,6,8])
+            subplot(rows,cols,[2,4,6,8], 'Parent', figurePane)
             hold on
             title('GGV Map')
             surf(GGV(:,:,2),GGV(:,:,1),GGV(:,:,3))
@@ -473,6 +479,7 @@ classdef OpenVEHICLE < handle
             
             % saving figure
             savefig(vehname+".fig")
+            app.plotPane = figurePane;
             % HUD
             disp('Plots created and saved.')
             
@@ -484,10 +491,10 @@ classdef OpenVEHICLE < handle
             diary('off') ;
         end
 
-        function OpenVEHICLE = OpenVEHICLE(filename)
+        function OpenVEHICLE = OpenVEHICLE
             % Initialises the OpenVEHICLE object
-            OpenVEHICLE.filename = filename;
-            OpenVEHICLE.runSimulation();
+%             OpenVEHICLE.filename = filename;
+%             OpenVEHICLE.runSimulation();
         end
 
     end

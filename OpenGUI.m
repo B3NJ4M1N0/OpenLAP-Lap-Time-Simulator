@@ -98,6 +98,9 @@ classdef OpenGUI < handle
 
         function runButtonPressed(app, ~, ~)
 
+            % Make sure the figurePanel is cleared
+            delete(app.GUI.resultsPane)
+
             listIndex = app.GUI.simulationList.Value;
             simulationName = app.GUI.simulationList.String{listIndex};
 
@@ -125,11 +128,13 @@ classdef OpenGUI < handle
         function app = runOpenTRACK(app, ~, ~)
             % Runs the OpenTRACK function with the given GUI inputs
             filename = fullfile( 'Tracks', app.GUI.trackSelectionBox.String{app.GUI.trackSelectionBox.Value} );
-            app.TRACK = OpenTRACK(filename);
+            app.TRACK = OpenTRACK;
+            app.TRACK.filename = filename;
             app.TRACK.mode = 'shape data';
             app.TRACK.log_mode = 'speed & latacc';
+            app.TRACK.runSimulation;
             % Get the plot object from OpenTRACK and assign it to the results panel.
-            trackPlot = app.TRACK.plotPane; % this doesn't exist yet
+            trackPlot = app.TRACK.plotPane;
             trackPlot.Parent = app.GUI.resultsPane;
             % Attempt some garbage collection
             close(app.TRACK.fig);
@@ -138,7 +143,14 @@ classdef OpenGUI < handle
         function app = runOpenVEHICLE(app, ~, ~)
             % Runs the OpenVEHICLE function with the given GUI inputs
             filename = app.GUI.vehicleSelectionBox.String{app.GUI.vehicleSelectionBox.Value};
-            app.VEHICLE = OpenVEHICLE(filename);
+            app.VEHICLE = OpenVEHICLE;
+            app.VEHICLE.filename = filename;
+            app.VEHICLE.runSimulation;
+            % Get the plot object from OpenVEHICLE and assign it to the results panel.
+            vehiclePlot = app.VEHICLE.plotPane;
+            vehiclePlot.Parent = app.GUI.resultsPane;
+            % Attempt some garbage collection
+            close(app.VEHICLE.fig)
 
         end
 
