@@ -1,0 +1,7 @@
+Create a 'simulation' class, that is inherited by DRAG, VEHICLE, TRACK (these become handles?)
+
+This superclass has props:
+Filepath
+
+functions:
+runSimulation
