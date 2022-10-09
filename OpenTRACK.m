@@ -62,22 +62,9 @@ classdef OpenTRACK < handle
         %% Clearing memory
         
         function runSimulation(app)    
-%             clear
-%             clc
-%             close all force
+
             diary('off')
             fclose('all') ;
-            
-            %% Track file selection
-            
-%             app.filename = fullfile('Tracks', 'Autodromo Nazionale Monza.xlsx');
-            
-            %% Mode selection
-            
-            % mode = 'logged data' ;
-%             app.mode = 'shape data' ;
-            % log_mode = 'speed & yaw' ;
-%             app.log_mode = 'speed & latacc' ;
             
             %% Settings
             
@@ -99,8 +86,10 @@ classdef OpenTRACK < handle
             if strcmp(app.mode,'logged data')
                 
                 %% from logged data
-                
+
                 [head,data] = read_logged_data(app.filename) ;
+%                 Add in a process data function
+%                 app.data = process_logged_data(head, data);
                 info.name = head(2,2) ;
                 info.country = head(3,2) ;
                 info.city = head(4,2) ;
@@ -200,7 +189,7 @@ classdef OpenTRACK < handle
                 %% from shape data
                 
                 [info] = app.read_info(app.filename,'Info') ;
-                table_shape = app.read_shape_data(app.filename,'Shape') ;
+                table_shape = app.read_shape_data(app.filename,'Shape', 2, 10000) ;
                 table_el = app.read_data(app.filename,'Elevation') ;
                 table_bk = app.read_data(app.filename,'Banking') ;
                 table_gf = app.read_data(app.filename,'Grip Factors') ;
@@ -637,37 +626,9 @@ classdef OpenTRACK < handle
             save(trackname+".mat",'info','x','dx','n','r','bank','incl','factor_grip','sector','r_apex','apex','X','Y','Z','arrow')
             % HUD
             disp('Track generated successfully.')
+
+%             app.displayASCII();
             
-%             %% ASCII map
-%             
-%             charh = 15 ; % font height [pixels]
-%             charw = 8 ; % font width [pixels]
-%             linew = 66 ; % log file character width
-%             mapw = max(X)-min(X) ; % map width
-%             YY = round(Y/(charh/charw)/mapw*linew) ; % scales y values
-%             XX = round(X/mapw*linew) ; % scales x values
-%             YY = -YY-min(-YY) ; % flipping y and shifting to positive space
-%             XX = XX-min(XX) ; % shifting x to positive space
-%             p = unique([XX,YY],'rows') ; % getting unique points
-%             XX = p(:,1)+1 ; % saving x
-%             YY = p(:,2)+1 ; % saving y
-%             maph = max(YY) ; % getting new map height [lines]
-%             mapw = max(XX) ; % getting new map width [columns]
-%             map = char(maph,mapw) ; % character map preallocation
-%             % looping through characters
-%             for i=1:maph
-%                 for j=1:mapw
-%                     check = [XX,YY]==[j,i] ; % checking if pixel is on
-%                     check = check(:,1).*check(:,2) ; % combining truth table
-%                     if max(check)
-%                         map(i,j) = 'o' ; % pixel is on
-%                     else
-%                         map(i,j) = ' ' ; % pixel is off
-%                     end
-%                 end
-%             end
-%             disp('Map:')
-%             disp(map)
             
             % diary
             diary('off') ;
@@ -675,6 +636,40 @@ classdef OpenTRACK < handle
         
         %% Functions
         
+        function displayASCII(X, Y)
+            %% ASCII map
+            
+            charh = 15 ; % font height [pixels]
+            charw = 8 ; % font width [pixels]
+            linew = 66 ; % log file character width
+            mapw = max(X)-min(X) ; % map width
+            YY = round(Y/(charh/charw)/mapw*linew) ; % scales y values
+            XX = round(X/mapw*linew) ; % scales x values
+            YY = -YY-min(-YY) ; % flipping y and shifting to positive space
+            XX = XX-min(XX) ; % shifting x to positive space
+            p = unique([XX,YY],'rows') ; % getting unique points
+            XX = p(:,1)+1 ; % saving x
+            YY = p(:,2)+1 ; % saving y
+            maph = max(YY) ; % getting new map height [lines]
+            mapw = max(XX) ; % getting new map width [columns]
+            map = char(maph,mapw) ; % character map preallocation
+            % looping through characters
+            for i=1:maph
+                for j=1:mapw
+                    check = [XX,YY]==[j,i] ; % checking if pixel is on
+                    check = check(:,1).*check(:,2) ; % combining truth table
+                    if max(check)
+                        map(i,j) = 'o' ; % pixel is on
+                    else
+                        map(i,j) = ' ' ; % pixel is off
+                    end
+                end
+            end
+            disp('Map:')
+            disp(map)
+        end
+
+
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [info] = read_info(~, workbookFile,sheetName,startRow,endRow)
             % Input handling
@@ -717,6 +712,15 @@ classdef OpenTRACK < handle
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         function [tbl] = read_shape_data(~, workbookFile,sheetName,startRow,endRow)
+            
+            arguments
+                ~
+                workbookFile 
+                sheetName char
+                startRow double
+                endRow double
+            end
+
             % Input handling
             % If no sheet is specified, read first sheet
             if nargin == 1 || isempty(sheetName)

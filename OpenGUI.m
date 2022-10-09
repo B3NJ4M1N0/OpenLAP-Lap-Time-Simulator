@@ -41,17 +41,13 @@ classdef OpenGUI < handle
             app.GUI.simulationPanel.Position = [0.025 0.05 0.2 0.5];
             app.GUI.simulationPanel.Title = 'Simulation Setup';
 
-            % TODO: add in a results pane on the right that will hold the plots.
-            app.GUI.resultsPane = uipanel('parent', app.GUI.window);
-            app.GUI.resultsPane.Units = 'normalized';
-            app.GUI.resultsPane.Position = [0.3 0.1 0.6 0.8];
-            app.GUI.resultsPane.Title = 'Results';
+            app.initialiseResultsPane();
 
             % Create a 'run' button
             app.GUI.runButton = uicontrol('parent',app.GUI.window,'Style','pushbutton');
             app.GUI.runButton.String = 'Run Simulation';
             app.GUI.runButton.Units = 'normalized';
-            app.GUI.runButton.Position = [0.85 0.1 0.1 0.1];
+            app.GUI.runButton.Position = [0.85 0.05 0.1 0.05];
             app.GUI.runButton.Callback = @app.runButtonPressed;
 
         end
@@ -96,10 +92,24 @@ classdef OpenGUI < handle
 
         end
 
+        function initialiseResultsPane(app, ~, ~)
+            % delete panel if exists
+            if isfield(app.GUI, 'resultsPane')
+                delete(app.GUI.resultsPane)
+            end
+
+            % recreate panel
+            app.GUI.resultsPane = uipanel('parent', app.GUI.window);
+            app.GUI.resultsPane.Units = 'normalized';
+            app.GUI.resultsPane.Position = [0.3 0.1 0.6 0.8];
+            app.GUI.resultsPane.Title = 'Results';
+        end
+
+
         function runButtonPressed(app, ~, ~)
 
-            % Make sure the figurePanel is cleared
-            delete(app.GUI.resultsPane)
+            % Reinitialise the resultsPane
+            app.initialiseResultsPane();
 
             listIndex = app.GUI.simulationList.Value;
             simulationName = app.GUI.simulationList.String{listIndex};
