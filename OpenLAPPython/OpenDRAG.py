@@ -37,7 +37,7 @@
 #
 # LinkedIn: 
 # email: bensimpsonwarwick@gmail.com
-# GitHub: https://gitbub.com/B3NJ4M1N0
+# GitHub: https://github.com/B3NJ4M1N0
 #
 # April 2022.
 #
