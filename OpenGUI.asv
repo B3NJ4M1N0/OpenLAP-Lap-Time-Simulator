@@ -5,10 +5,10 @@ classdef OpenGUI < handle
     properties
         window
         GUI
-        VEHICLE
-        TRACK
-        DRAG
-        LAP
+        VEHICLE % class = simulation (WIP)
+        TRACK % class = simulation
+        DRAG % class = simulation
+        LAP % class = simulation
     end
     
     methods
@@ -41,17 +41,13 @@ classdef OpenGUI < handle
             app.GUI.simulationPanel.Position = [0.025 0.05 0.2 0.5];
             app.GUI.simulationPanel.Title = 'Simulation Setup';
 
-            % TODO: add in a results pane on the right that will hold the plots.
-            app.GUI.resultsPane = uipanel('parent', app.GUI.window);
-            app.GUI.resultsPane.Units = 'normalized';
-            app.GUI.resultsPane.Position = [0.3 0.1 0.6 0.8];
-            app.GUI.resultsPane.Title = 'Results';
+            app.initialiseResultsPane();
 
             % Create a 'run' button
             app.GUI.runButton = uicontrol('parent',app.GUI.window,'Style','pushbutton');
             app.GUI.runButton.String = 'Run Simulation';
             app.GUI.runButton.Units = 'normalized';
-            app.GUI.runButton.Position = [0.85 0.1 0.1 0.1];
+            app.GUI.runButton.Position = [0.85 0.05 0.1 0.05];
             app.GUI.runButton.Callback = @app.runButtonPressed;
 
         end
@@ -96,7 +92,24 @@ classdef OpenGUI < handle
 
         end
 
+        function initialiseResultsPane(app, ~, ~)
+            % delete panel if exists
+            if isfield(app.GUI, 'resultsPane')
+                delete(app.GUI.resultsPane)
+            end
+
+            % recreate panel
+            app.GUI.resultsPane = uipanel('parent', app.GUI.window);
+            app.GUI.resultsPane.Units = 'normalized';
+            app.GUI.resultsPane.Position = [0.3 0.1 0.6 0.8];
+            app.GUI.resultsPane.Title = 'Results';
+        end
+
+
         function runButtonPressed(app, ~, ~)
+
+            % Reinitialise the resultsPane
+            app.initialiseResultsPane();
 
             listIndex = app.GUI.simulationList.Value;
             simulationName = app.GUI.simulationList.String{listIndex};
@@ -125,18 +138,29 @@ classdef OpenGUI < handle
         function app = runOpenTRACK(app, ~, ~)
             % Runs the OpenTRACK function with the given GUI inputs
             filename = fullfile( 'Tracks', app.GUI.trackSelectionBox.String{app.GUI.trackSelectionBox.Value} );
-            app.TRACK = OpenTRACK(filename);
+            app.TRACK = OpenTRACK;
+            app.TRACK.filename = filename;
             app.TRACK.mode = 'shape data';
             app.TRACK.log_mode = 'speed & latacc';
+            app.TRACK.runSimulation;
             % Get the plot object from OpenTRACK and assign it to the results panel.
-            trackPlot = app.TRACK.plotPane; % this doesn't exist yet
+            trackPlot = app.TRACK.plotPane;
             trackPlot.Parent = app.GUI.resultsPane;
+            % Attempt some garbage collection
+            close(app.TRACK.fig);
         end
 
         function app = runOpenVEHICLE(app, ~, ~)
             % Runs the OpenVEHICLE function with the given GUI inputs
             filename = app.GUI.vehicleSelectionBox.String{app.GUI.vehicleSelectionBox.Value};
-            app.VEHICLE = OpenVEHICLE(filename);
+            app.VEHICLE = OpenVEHICLE;
+            app.VEHICLE.filename = filename;
+            app.VEHICLE.runSimulation;
+            % Get the plot object from OpenVEHICLE and assign it to the results panel.
+            vehiclePlot = app.VEHICLE.plotPane;
+            vehiclePlot.Parent = app.GUI.resultsPane;
+            % Attempt some garbage collection
+            close(app.VEHICLE.fig)
 
         end
 

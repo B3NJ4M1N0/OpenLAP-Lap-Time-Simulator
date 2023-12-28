@@ -5,10 +5,10 @@ classdef OpenGUI < handle
     properties
         window
         GUI
-        VEHICLE
-        TRACK
-        DRAG
-        LAP
+        VEHICLE % class = simulation (WIP)
+        TRACK % class = simulation
+        DRAG % class = simulation
+        LAP % class = simulation
     end
     
     methods
@@ -129,6 +129,8 @@ classdef OpenGUI < handle
 
         function app = runOpenDRAG(app, ~, ~)
             % Runs the OpenDRAG function with the given GUI inputs
+            app.DRAG = OpenDRAG;
+            
         end
 
         function app = runOpenLAP(app, ~, ~)
